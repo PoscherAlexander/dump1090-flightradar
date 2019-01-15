@@ -1,0 +1,156 @@
+.body-padding {
+  padding-top: 54px;
+}
+
+@media (min-width: 992px) {
+  .body-padding {
+    padding-top: 54px;
+  }
+}
+
+.map-header {
+  height: 80vh;
+  min-height: 300px;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: cover;
+  -o-background-size: cover;
+}
+
+.map-canvas {
+    height: 100%;
+}
+
+.viewport {
+    height: 100%;
+}
+
+.margin-large-top {
+    margin-top: 100px;
+}
+
+.margin-large-bottom {
+    margin-bottom: 100px;
+}
+
+header.masthead {
+  padding-top: 0;
+  padding-bottom: 0;
+  background-position: center center;
+  background-size: cover;
+  height: 100vh;
+}
+
+.header-background {
+    background-image: url("http://flightradar.poscher.me/cdn/img/wing_background.jpg");
+}
+
+header.masthead hr {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+header.masthead h1 {
+  font-size: 2rem;
+}
+
+header.masthead p {
+  font-weight: 300;
+}
+
+@media (min-width: 768px) {
+  header.masthead p {
+    font-size: 1.15rem;
+  }
+}
+
+@media (min-width: 992px) {
+  header.masthead {
+    height: 100vh;
+    min-height: 650px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  header.masthead h1 {
+    font-size: 3rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  header.masthead h1 {
+    font-size: 4rem;
+  }
+}
+
+.table-remove-border-top th,
+.table-remove-border-top thead th {
+    border-top: 0;
+}
+
+@keyframes ld-slide-ltr {
+    0%, to {
+        animation-timing-function: cubic-bezier(.5, 0, 1, .5);
+        -webkit-transform: translate(0, 0);
+        transform: translate(0, 0)
+    }
+
+    50% {
+        animation-timing-function: cubic-bezier(0, .5, .5, 1);
+        -webkit-transform: translate(-200%, 0);
+        transform: translate(-200%, 0)
+    }
+
+    49.9% {
+        -webkit-transform: translate(200%, 0);
+        transform: translate(200%, 0)
+    }
+}
+
+@-webkit-keyframes ld-slide-ltr {
+    0%, to {
+        animation-timing-function: cubic-bezier(.5, 0, 1, .5);
+        -webkit-transform: translate(0, 0);
+        transform: translate(0, 0)
+    }
+
+    50% {
+        animation-timing-function: cubic-bezier(0, .5, .5, 1);
+        -webkit-transform: translate(-200%, 0);
+        transform: translate(-200%, 0)
+    }
+
+    49.9% {
+        -webkit-transform: translate(200%, 0);
+        transform: translate(200%, 0)
+    }
+}
+
+.ld.ld-slide-ltr {
+    -webkit-animation: ld-slide-ltr 1.5s infinite;
+    animation: ld-slide-ltr 1.5s infinite
+}
+
+@keyframes ld-fade {
+    0% {
+        opacity: 1
+    }
+
+    to {
+        opacity: 0
+    }
+}
+
+@-webkit-keyframes ld-fade {
+    0% {
+        opacity: 1
+    }
+
+    to {
+        opacity: 0
+    }
+}
+
+.ld.ld-fade {
+    -webkit-animation: ld-fade 1s infinite linear;
+    animation: ld-fade 1s infinite linear
+}
