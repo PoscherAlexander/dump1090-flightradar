@@ -551,7 +551,7 @@ function getAircraftInfo(icao) {
 function getPlaneModel(modelCode) {
     $.ajax ({
         type: 'GET',
-        url: 'http://yourdomain.com/v1/plane/?icao=' + modelCode,
+        url: FLIGHT_DATABASE_DOMAIN + '/v1/plane/?icao=' + modelCode,
         success: function(data) {
             var plane = data;
             if(plane.name != '') {
@@ -572,7 +572,7 @@ function getPlaneModel(modelCode) {
 function getAirline(iataCode) {
     $.ajax ({
         type: 'GET',
-        url: 'http://yourdomain.com/v1/airline/?iata=' + iataCode,
+        url: FLIGHT_DATABASE_DOMAIN + '/v1/airline/?iata=' + iataCode,
         success: function(data) {
             var airline = data;
             if(airline.name != '') {
@@ -645,7 +645,7 @@ function getDepartureAirport(airporticao) {
 function getArrivalAirport(airporticao) {
     $.ajax ({
         type: 'GET',
-        url: 'http://yourdomain.com/v1/airport/?icao=' + airporticao,
+        url: FLIGHT_DATABASE_DOMAIN + '/v1/airport/?icao=' + airporticao,
         success: function(data) {
             var airport = data;
             if(airport.name != '') {

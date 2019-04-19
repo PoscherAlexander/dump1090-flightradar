@@ -31,6 +31,10 @@ You will need the following equipment to install the flight tracking tool for ne
 
 
 
+### Setup the Raspberry Pi
+
+<https://thepi.io/how-to-install-raspbian-on-the-raspberry-pi/>
+
 ### Installation
 
 #### RTL-SDR Driver
@@ -128,13 +132,15 @@ You will need the following equipment to install the flight tracking tool for ne
    git clone https://github.com/PoscherAlexander/dump1090-flightradar.git
    ```
 
-2. Compile the files in the dump1090 folder
+2. Compile the files in the dump1090-flightradar folder
 
    ```bash
    make
    ```
 
+3. Get and Change the Google Maps JavaScript API Key in `dump1090-flightradar/public_html/gmap.html` on line 161
 
+   [How to create a new Google Maps JavaScript API-Key?](<https://developers.google.com/maps/documentation/javascript/get-api-key>)
 
 #### Start the app
 
@@ -146,7 +152,7 @@ You will need the following equipment to install the flight tracking tool for ne
 
 #### Configuration (optional)
 
-Your can configure your FlightRadar by editing the `config.js` file in `dump1090/public_html/js/config.js`
+Your can configure your FlightRadar by editing the `config.js` file in `dump1090-flightradar/public_html/js/config.js`
 
 ```javascript
 /**
@@ -205,12 +211,12 @@ Color of the airplanes on the map
 
 If you want to have additional flight information, but you don't have a webserver, you can get one [here](https://zap-hosting.com/a/881fdc741faed5e9a1e05599bc869bcaea3144de).
 
-- Import the mySQL Database from `dump1090/public_html/sql` to your webserver
+- Import the mySQL Database from `dump1090-flightradar/public_html/sql` to your webserver
 
   - Don't know how to do that? [Here is some help.](https://docs.plesk.com/en-US/12.5/customer-guide/advanced-website-databases/creating-databases.65157/)
-  - [Import a Database](<https://docs.plesk.com/en-US/12.5/customer-guide/advanced-website-databases/exporting-and-importing-database-dumps.69538/>)
+  - [How to import a database?](<https://docs.plesk.com/en-US/12.5/customer-guide/advanced-website-databases/exporting-and-importing-database-dumps.69538/>)
 
-- Change the username, password, database and host to your personal database settings in `dump1090/public_html/php/v1/databse/AirConnect.php`
+- Change the username, password, database and host to your personal database settings in `dump1090-flightradar/public_html/php/v1/databse/AirConnect.php`
 
   ```php
   <?php
