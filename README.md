@@ -1,284 +1,261 @@
-Dump1090 README
-===
+# FlightRadar
 
-Dump 1090 is a Mode S decoder specifically designed for RTLSDR devices.
+**with DUMP1090**
 
-The main features are:
+## About
 
-* Robust decoding of weak messages, with mode1090 many users observed
-  improved range compared to other popular decoders.
-* Network support: TCP30003 stream (MSG5...), Raw packets, HTTP.
-* Embedded HTTP server that displays the currently detected aircrafts on
-  Google Map.
-* Single bit errors correction using the 24 bit CRC.
-* Ability to decode DF11, DF17 messages.
-* Ability to decode DF formats like DF0, DF4, DF5, DF16, DF20 and DF21
-  where the checksum is xored with the ICAO address by brute forcing the
-  checksum field using recently seen ICAO addresses.
-* Decode raw IQ samples from file (using --ifile command line switch).
-* Interactive command-line-interfae mode where aircrafts currently detected
-  are shown as a list refreshing as more data arrives.
-* CPR coordinates decoding and track calculation from velocity.
-* TCP server streaming and recceiving raw data to/from connected clients
-  (using --net).
+The FlightRadar is a web-based flight tracking tool for nearby flights. A new, modern and responsive web interface, lets the user easily track nearby flights. All visible flights are displayed on a clear table and a map visualizes the current flights. Detailed information to a flight can be displayed by clicking on the corresponding flight on the table, or the map. The FlightRadar webinterface uses the Dump1090 Decoder by written by Salvatore Sanfilippo.
 
-Installation
----
 
-Type "make".
 
-Normal usage
----
+## Setup the FlightRadar
 
-To capture traffic directly from your RTL device and show the captured traffic
-on standard output, just run the program without options at all:
+### Equipment
 
-    ./dump1090
+You will need the following equipment to install the flight tracking tool for nearby flights:
 
-To just output hexadecimal messages:
+#### Required
 
-    ./dump1090 --raw
+- Raspberry Pi
+- Micro SD Card
+- Ethernet Cable or WiFi Dongle (Pi 3 has WiFi inbuilt)
+- Power Adapter
+- Mini DVB-T Digital TV USB Dongle
 
-To run the program in interactive mode:
+#### Optional
 
-    ./dump1090 --interactive
+- Raspberry Pi Case
+- USB-Keyboard
+- USB-Mouse
+- Raspberry Pi Heatsink
 
-To run the program in interactive mode, with networking support, and connect
-with your browser to http://localhost:8080 to see live traffic:
 
-    ./dump1090 --interactive --net
 
-In iteractive mode it is possible to have a less information dense but more
-"arcade style" output, where the screen is refreshed every second displaying
-all the recently seen aircrafts with some additional information such as
-altitude and flight number, extracted from the received Mode S packets.
+### Installation
 
-Using files as source of data
----
+#### RTL-SDR Driver
 
-To decode data from file, use:
+1. Install all required packages
 
-    ./dump1090 --ifile /path/to/binfile
+   ```bash
+   sudo apt-get install git build-essential cmake libusb-1.0-0-dev screen
+   ```
 
-The binary file should be created using `rtl_sdr` like this (or with any other
-program that is able to output 8-bit unsigned IQ samples at 2Mhz sample rate).
+2. Clone the following Git-Repository
 
-    rtl_sdr -f 1090000000 -s 2000000 -g 50 output.bin
+   ```bash
+   git clone git://git.osmocom.org/rtl-sdr.git
+   ```
 
-In the example `rtl_sdr` a gain of 50 is used, simply you should use the highest
-gain availabe for your tuner. This is not needed when calling Dump1090 itself
-as it is able to select the highest gain supported automatically.
+3. Create a new folder in ~/rtl-sdr
 
-It is possible to feed the program with data via standard input using
-the --ifile option with "-" as argument.
+   ```bash
+   cd ~/rtl-sdr 
+   mkdir build
+   ```
 
-Additional options
----
+4. Execute xmake in ~/rtl-sdr/build
 
-Dump1090 can be called with other command line options to set a different
-gain, frequency, and so forth. For a list of options use:
+   ```bash
+   cmake ../ -DINSTALL_UDEV_RULES=ON
+   ```
 
-    ./dump1090 --help
+5. Compile the Driver
 
-Everything is not documented here should be obvious, and for most users calling
-it without arguments at all is the best thing to do.
+   ```bash
+   sudo make install
+   sudo ldconfig
+   ```
 
-Reliability
----
+6. Go back to the home directory
 
-By default Dump1090 checks for decoding errors using the 24-bit CRC checksum,
-where available. Messages with errors are discarded.
+   ```bash
+   cd ~
+   ```
 
-The --fix command line switch enables fixing single bit error correction
-based on the CRC checksum. Technically, it uses a table of precomputed
-checksum differences resulting from single bit errors to look up the
-wrong bit position.
+7. Copy rtl-sdr rules to avoid 'device not found' error
 
-This is indeed able to fix errors and works reliably in my experience,
-however if you are interested in very reliable data I suggest to use
-the --no-fix command line switch in order to disable error fixing.
+   ```bash
+   sudo cp ./rtl-sdr/rtl-sdr.rules /etc/udev/rules.d/
+   ```
 
-Performances and sensibility of detection
----
+8. Create a configuration file, to block DVB-T TV-Signals
 
-In my limited experience Dump1090 was able to decode a big number of messages
-even in conditions where I encountered problems using other programs, however
-no formal test was performed so I can't really claim that this program is
-better or worse compared to other similar programs.
+   ```bash
+   cd /etc/modprobe.d/
+   sudo nano rtlsdr.conf
+   ```
 
-If you can capture traffic that Dump1090 is not able to decode properly, drop
-me an email with a download link. I may try to improve the detection during
-my free time (this is just an hobby project).
+9. Add the following line at the end of the file
 
-Network server features
----
+   ```bash
+   blacklist dvb_usb_rtl28xxu
+   ```
 
-By enabling the networking support with --net Dump1090 starts listening
-for clients connections on port 30002 and 30001 (you can change both the
-ports if you want, see --help output).
+10. Reboot the Raspberry Pi
 
-Port 30002
----
+    ```bash
+    sudo reboot
+    ```
 
-Connected clients are served with data ASAP as they arrive from the device
-(or from file if --ifile is used) in the raw format similar to the following:
+11. Check the functionality of the dongle
 
-    *8D451E8B99019699C00B0A81F36E;
+    ```bash
+    rtl_test -t
+    ```
 
-Every entry is separated by a simple newline (LF character, hex 0x0A).
+    Example Response:
 
-Port 30001
----
+    ```
+    Found 1 device(s):
+      0:  Realtek, RTL2838UHIDIR, SN: 00000001
+    
+    Using device 0: Generic RTL2832U OEM
+    Found Rafael Micro R820T tuner
+    Supported gain values (29): 0.0 0.9 1.4 2.7 3.7 7.7 8.7 12.5 14.4 15.7 16.6 19.7 20.7 22.9 25.4 28.0 29.7 32.8 33.8 36.4 37.2 38.6 40.2 42.1 43.4 43.9 44.5 48.0 49.6
+    [R82XX] PLL not locked!
+    Sampling at 2048000 S/s.
+    No E4000 tuner found, aborting.
+    ```
 
-Port 30001 is the raw input port, and can be used to feed Dump1090 with
-data in the same format as specified above, with hex messages starting with
-a `*` and ending with a `;` character.
 
-So for instance if there is another remote Dump1090 instance collecting data
-it is possible to sum the output to a local Dump1090 instance doing something
-like this:
 
-    nc remote-dump1090.example.net 30002 | nc localhost 30001
+#### FlightRadar with DUMP1090 Decoder
 
-It is important to note that what is received via port 30001 is also
-broadcasted to clients listening to port 30002.
+1. Clone the following Git-Repository
 
-In general everything received from port 30001 is handled exactly like the
-normal traffic from RTL devices or from file when --ifile is used.
+   ```bash
+   git clone https://github.com/PoscherAlexander/dump1090-flightradar.git
+   ```
 
-It is possible to use Dump1090 just as an hub using --ifile with /dev/zero
-as argument as in the following example:
+2. Compile the files in the dump1090 folder
 
-    ./dump1090 --net-only
+   ```bash
+   make
+   ```
 
-Or alternatively to see what's happening on the screen:
 
-    ./dump1090 --net-only --interactive
 
-Then you can feed it from different data sources from the internet.
+#### Start the app
 
-Port 30003
----
+```bash
+./dump1090 --interactive --aggressive --enable-agc --net
+```
 
-Connected clients are served with messages in SBS1 (BaseStation) format,
-similar to:
 
-    MSG,4,,,738065,,,,,,,,420,179,,,0,,0,0,0,0
-    MSG,3,,,738065,,,,,,,35000,,,34.81609,34.07810,,,0,0,0,0
 
-This can be used to feed data to various sharing sites without the need to use another decoder.
+#### Configuration (optional)
 
-Antenna
----
+Your can configure your FlightRadar by editing the `config.js` file in `dump1090/public_html/js/config.js`
 
-Mode S messages are transmitted in the 1090 Mhz frequency. If you have a decent
-antenna you'll be able to pick up signals from aircrafts pretty far from your
-position, especially if you are outdoor and in a position with a good sky view.
+```javascript
+/**
+ * Configuration settings for the webinterface
+ */
 
-You can easily build a very cheap antenna following the istructions at:
+//Additional Flight Information
+ENABLE_ADDITIONAL_FLIGHT_INFORMATION = false;
+AVI_API_KEY = 'YOUR_API_KEY';
+OPENSKY_USERNAME = 'YOUR_OPENSKY_USERNAME';
+OPENSKY_PASSWORD = 'YOUR_OPENSKY_PASSWORD';
+FLIGHT_DATABASE_DOMAIN = 'http://yourdomain.com';
 
-    http://antirez.com/news/46
+//Plane Marker
+MarkerColor	  = "rgb(39, 128, 227)";
+SelectedColor = "rgb(25, 103, 190)";
+StaleColor = "rgb(39, 128, 227)";
 
-With this trivial antenna I was able to pick up signals of aircrafts 200+ Km
-away from me.
+//Map
+CONST_CENTERLAT = 48.306250;
+CONST_CENTERLON = 14.310660;
+CONST_ZOOMLVL   = 7;
+```
 
-If you are interested in a more serious antenna check the following
-resources:
+##### Map
 
-* http://gnuradio.org/redmine/attachments/download/246/06-foster-adsb.pdf
-* http://www.lll.lu/~edward/edward/adsb/antenna/ADSBantenna.html
-* http://modesbeast.com/pix/adsb-ant-drawing.gif
+Latitude and Longitude of the maps central position and the zoom level of the map
 
-Aggressive mode
----
+##### Plane Marker
 
-With --aggressive it is possible to activate the *aggressive mode* that is a
-modified version of the Mode S packet detection and decoding.
-The aggresive mode uses more CPU usually (especially if there are many planes
-sending DF17 packets), but can detect a few more messages.
+Color of the airplanes on the map
 
-The algorithm in aggressive mode is modified in the following ways:
+##### Additional Flight Information
 
-* Up to two demodulation errors are tolerated (adjacent entires in the
-  magnitude vector with the same eight). Normally only messages without
-  errors are checked.
-* It tries to fix DF17 messages with CRC errors resulting from any two bit
-  errors.
+- **ENABLE_ADDITIONAL_FLIGHT_INFORMATION**
 
-The use of aggressive mdoe is only advised in places where there is
-low traffic in order to have a chance to capture some more messages.
+  Display additional flight information like plane model, airline, departure airport, etc. (**API-Keys and Webserver required!**)
 
-Debug mode
----
+- **AVI_API_KEY**
 
-The Debug mode is a visual help to improve the detection algorithm or to
-understand why the program is not working for a given input.
+  - Create an API-Key at [Aviation Edge](https://aviation-edge.com/premium-api/)
+  - Add the API-Key from Aviation Edge to the AVI_API_KEY variable
 
-In this mode messages are displayed in an ASCII-art style graphical
-representation, where the individial magnitude bars sampled at 2Mhz are
-displayed.
+- **OPENSKY_USERNAME and OPENSKY_PASSWORD**
 
-An index shows the sample number, where 0 is the sample where the first
-Mode S peak was found. Some additional background noise is also added
-before the first peak to provide some context.
+  - Create an account at <https://opensky-network.org/>
+  - Enter username and password in the associated files
 
-To enable debug mode and check what combinations of packets you can
-log, use `mode1090 --help` to obtain a list of available debug flags.
+- **FLIGHT_DATABASE_DOMAIN**
 
-Debug mode includes an optional javascript output that is used to visualize
-packets using a web browser, you can use the file debug.html under the
-'tools' directory to load the generated frames.js file.
+  RestAPI and Database Link for Airport, Airline and Plane Information
 
-How this program works?
----
+  Installation will be explained in 'Installation of PHP REST-API for Additional Flight Information'
 
-The code is very documented and written in order to be easy to understand.
-For the diligent programmer with a Mode S specification on his hands it
-should be trivial to understand how it works.
+##### Installation of PHP REST-API for Additional Flight Information
 
-The algorithms I used were obtained basically looking at many messages
-as displayed using a trow-away SDL program, and trying to model the algorithm
-based on how the messages look graphically.
+If you want to have additional flight information, but you don't have a webserver, you can get one [here](https://zap-hosting.com/a/881fdc741faed5e9a1e05599bc869bcaea3144de).
 
-How to test the program?
----
+- Import the mySQL Database from `dump1090/public_html/sql` to your webserver
 
-If you have an RTLSDR device and you happen to be in an area where there
-are aircrafts flying over your head, just run the program and check for signals.
+  - Don't know how to do that? [Here is some help.](https://docs.plesk.com/en-US/12.5/customer-guide/advanced-website-databases/creating-databases.65157/)
+  - [Import a Database](<https://docs.plesk.com/en-US/12.5/customer-guide/advanced-website-databases/exporting-and-importing-database-dumps.69538/>)
 
-However if you don't have an RTLSDR device, or if in your area the presence
-of aircrafts is very limited, you may want to try the sample file distributed
-with the Dump1090 distribution under the "testfiles" directory.
+- Change the username, password, database and host to your personal database settings in `dump1090/public_html/php/v1/databse/AirConnect.php`
 
-Just run it like this:
+  ```php
+  <?php
+  
+  class AirConnect
+  {
+      public static function establish()
+      {
+          //Input Data for mySQL Connection to public server
+          //make changes here!
+          $servername = "localhost";	//host here (usually localhost)
+          $username = "database_username";    //username here
+          $password = "database_password";    //password here
+          $dbname = "database";   //database here
+  
+          $conn = new mysqli($servername, $username, $password, $dbname);
+          $conn->set_charset('UTF8');
+  
+          if ($conn->connect_error) {
+              die("Error: Server is temporary not avaliable");
+              return false;
+          } else {
+              return $conn;
+          }
+      }
+  }
+  ?>
+  ```
 
-    ./dump1090 --ifile testfiles/modes1.bin
+- Upload the v1 folder in the php folder to your webserver
 
-What is --strip mode?
----
+  - Don't know how to do that? [Here is some help.](<https://docs.plesk.com/en-US/12.5/customer-guide/websites-and-domains/website-content/uploading-content-with-file-manager.74105/>)
 
-It is just a simple filter that will get raw IQ 8 bit samples in input
-and will output a file missing all the parts of the file where I and Q
-are lower than the specified <level> for more than 32 samples.
+- Depending on where you uploaded the files, the API is now available generally at: `http[s]://[subdomain.]yourdomain.com/[folder/]`
 
-Use it like this:
+- Enter this url in the FLIGHT_DATABASE_DOMAIN variable
 
-    cat big.bin | ./dump1090 --snip 25 > small.bin
 
-I used it in order to create a small test file to include inside this
-program source code distribution.
 
-Contributing
----
+## DUMP1090
 
-Dump1090 was written during some free time during xmas 2012, it is an hobby
-project so I'll be able to address issues and improve it only during
-free time, however you are incouraged to send pull requests in order to
-improve the program. A good starting point can be the TODO list included in
-the source distribution.
+Please read the README_DUMP1090.md for more information about the DUMP1090 decoder.
 
-Credits
----
 
-Dump1090 was written by Salvatore Sanfilippo <antirez@gmail.com> and is
-released under the BSD three clause license.
+
+## Credits
+
+FlightRadar, the web-based flight tracking tool was written by Alex Poscher (dev@poscher.me).

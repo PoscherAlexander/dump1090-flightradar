@@ -8,7 +8,6 @@ var SelectedPlane = null;
 var SelectedPlaneOnTable = null;
 var SelectedPlaneICAO = null;
 var SpecialSquawk = false;
-var AviApiKey = 'YOUR_API_KEY';
 
 //env
 CenterLat = Number(localStorage['CenterLat']) || CONST_CENTERLAT;
@@ -505,8 +504,10 @@ function selectPlane(icao) {
         refreshTableInfo();
         refreshSelected();
         refreshApiInfo();
-        getAircraftInfo(icao);
-        getFlight(icao);
+        if (ENABLE_ADDITIONAL_FLIGHT_INFORMATION) {
+            getAircraftInfo(icao);
+            getFlight(icao);
+        }
 
         $('#table_plane_row_' + SelectedPlane).addClass('table-primary');
         $('#flightDetailModal').modal('show');
@@ -524,7 +525,7 @@ function selectPlane(icao) {
 function getAircraftInfo(icao) {
     $.ajax ({
         type: 'GET',
-        url: 'https://aviation-edge.com/v2/public/airplaneDatabase?key=' + AviApiKey + '&hexIcaoAirplane=' + icao,
+        url: 'https://aviation-edge.com/v2/public/airplaneDatabase?key=' + AVI_API_KEY + '&hexIcaoAirplane=' + icao,
         success: function(data) {
             var aircraft = JSON.parse(data);
             if(aircraft[0] !== undefined) {
@@ -550,7 +551,7 @@ function getAircraftInfo(icao) {
 function getPlaneModel(modelCode) {
     $.ajax ({
         type: 'GET',
-        url: 'http://flightradar.poscher.me/v1/plane/?icao=' + modelCode,
+        url: 'http://yourdomain.com/v1/plane/?icao=' + modelCode,
         success: function(data) {
             var plane = data;
             if(plane.name != '') {
@@ -571,7 +572,7 @@ function getPlaneModel(modelCode) {
 function getAirline(iataCode) {
     $.ajax ({
         type: 'GET',
-        url: 'http://flightradar.poscher.me/v1/airline/?iata=' + iataCode,
+        url: 'http://yourdomain.com/v1/airline/?iata=' + iataCode,
         success: function(data) {
             var airline = data;
             if(airline.name != '') {
@@ -596,7 +597,7 @@ function getFlight(icao) {
     var end = ts + 5000;
     $.ajax ({
         type: 'GET',
-        url: 'https://alexander:Testkey12@opensky-network.org/api/flights/aircraft?icao24=' + icao + '&begin=' + begin + '&end=' + end,
+        url: 'https://' + OPENSKY_USERNAME + ':' + OPENSKY_PASSWORD + '@opensky-network.org/api/flights/aircraft?icao24=' + icao + '&begin=' + begin + '&end=' + end,
         success: function(data) {
             var flight = data;
             if(flight[0].estDepartureAirport != null) {
@@ -619,7 +620,7 @@ function getFlight(icao) {
 function getDepartureAirport(airporticao) {
     $.ajax ({
         type: 'GET',
-        url: 'http://flightradar.poscher.me/v1/airport/?icao=' + airporticao,
+        url: FLIGHT_DATABASE_DOMAIN + '/v1/airport/?icao=' + airporticao,
         success: function(data) {
             var airport = data;
             if(airport.name != '') {
@@ -644,7 +645,7 @@ function getDepartureAirport(airporticao) {
 function getArrivalAirport(airporticao) {
     $.ajax ({
         type: 'GET',
-        url: 'http://flightradar.poscher.me/v1/airport/?icao=' + airporticao,
+        url: 'http://yourdomain.com/v1/airport/?icao=' + airporticao,
         success: function(data) {
             var airport = data;
             if(airport.name != '') {
