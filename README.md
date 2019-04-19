@@ -258,4 +258,6 @@ Please read the README_DUMP1090.md for more information about the DUMP1090 decod
 
 ## Credits
 
-FlightRadar, the web-based flight tracking tool was written by Alex Poscher (dev@poscher.me).
+FlightRadar, the web-based flight tracking tool (webinterface) was written by Alex Poscher (dev@poscher.me) and is released under the BSD three clause license.
+
+Dump1090 was written by Salvatore Sanfilippo [antirez@gmail.com](mailto:antirez@gmail.com) and is released under the BSD three clause license.
