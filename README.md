@@ -31,7 +31,7 @@ You will need the following equipment to install the flight tracking tool for ne
 
 
 
-### Setup the Raspberry Pi
+### Set up the Raspberry Pi
 
 <https://thepi.io/how-to-install-raspbian-on-the-raspberry-pi/>
 
@@ -58,7 +58,7 @@ You will need the following equipment to install the flight tracking tool for ne
    mkdir build
    ```
 
-4. Execute xmake in ~/rtl-sdr/build
+4. Execute cmake in ~/rtl-sdr/build
 
    ```bash
    cmake ../ -DINSTALL_UDEV_RULES=ON
@@ -264,6 +264,6 @@ Please read the README_DUMP1090.md for more information about the DUMP1090 decod
 
 ## Credits
 
-FlightRadar, the web-based flight tracking tool (webinterface) was written by Alex Poscher (dev@poscher.me) and is released under the BSD three clause license.
+FlightRadar, the web-based flight tracking tool (webinterface) was written by Alex Poscher (dev@poscher.me).
 
 Dump1090 was written by Salvatore Sanfilippo [antirez@gmail.com](mailto:antirez@gmail.com) and is released under the BSD three clause license.
